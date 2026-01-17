@@ -8,13 +8,14 @@ struct Telemetry {
 };
 
 void printTelemetry(Telemetry telem, int sim_time) {
+    std::cout << "====" << std::endl;
     std::cout << "sim_time: " << sim_time << std::endl;
 }
 
 int main() {
     // car telemetry
     Telemetry telem = {
-        .speed = 130.0f,
+        .speed = 50,
     };
 
     std::cout << "[Starting target app]" << std::endl;
