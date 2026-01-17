@@ -4,6 +4,7 @@
 #include <algorithm>
 
 struct Telemetry {
+    uint32_t sim_time;
     uint16_t speed;
     uint16_t rpm;
     uint8_t gear;
@@ -17,18 +18,21 @@ void printTelemetry(Telemetry telem, int sim_time) {
     std::cout << "\tgear: " << (int)telem.gear << std::endl;
 }
 
-void updateTelemetry(Telemetry &telem) {
+void updateTelemetry(Telemetry &telem, int sim_time) {
     int random_acc = rand() % 4 - 2; // <-2,2> random int
     int new_speed = (int)telem.speed + random_acc;
     telem.speed = (uint16_t)std::clamp(new_speed, 0, 400);
     telem.gear = 1 + (telem.speed / 20); // every 20km/h change the gear
     telem.rpm = (telem.speed % 20) * 300; // map speed in gear to rpm
+    telem.sim_time = sim_time; // add current simulation_time
 }
 
 int main() {
+    int sim_time = 0; // simulation time
+
     // car telemetry
     Telemetry telem = {
-        .speed = 50,
+        .speed = 50, // initial speed
     };
 
     updateTelemetry(telem);
@@ -37,8 +41,6 @@ int main() {
     std::cout << "PID: " << GetCurrentProcessId() << std::endl;
     std::cout << "Telemetry address: " << &telem << std::endl;
     std::cout << std::endl;
-
-    int sim_time = 0; // simulation time
 
     while (true) {
         // increment simulation time
