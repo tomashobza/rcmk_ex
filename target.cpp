@@ -12,11 +12,20 @@ void printTelemetry(Telemetry telem, int sim_time) {
     std::cout << "sim_time: " << sim_time << std::endl;
 }
 
+void updateTelemetry(Telemetry &telem) {
+    int random_acc = rand() % 4 - 2; // <-2,2> random int
+    telem.speed += random_acc; // change speed
+    telem.gear = 1 + (telem.speed / 20); // every 20km/h change the gear
+    telem.rpm = (telem.speed % 20) * 300; // map speed in gear to rpm
+}
+
 int main() {
     // car telemetry
     Telemetry telem = {
         .speed = 50,
     };
+
+    updateTelemetry(telem);
 
     std::cout << "[Starting target app]" << std::endl;
 
@@ -27,10 +36,7 @@ int main() {
         ++sim_time;
 
         // update telemetry
-        int random_acc = rand() % 4 - 2; // <-2,2> random int
-        telem.speed += random_acc; // change speed
-        telem.gear = 1 + (telem.speed / 20); // every 20km/h change the gear
-        telem.rpm = (telem.speed % 20) * 300; // map speed in gear to rpm
+        updateTelemetry(telem);
 
         printTelemetry(telem, sim_time);
 
