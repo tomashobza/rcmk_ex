@@ -51,10 +51,13 @@ int main() {
         // update telemetry
         updateTelemetry(telem, sim_time);
 
-        printTelemetry(telem, sim_time);
+        // print telemetry data to stdout
+        printTelemetry(telem);
 
+        // wait a sec
         Sleep(500);
 
+        // sanity check
         if (sim_time == INT_MAX) {
             std::cout << "End of time reached." << std::endl;
             break;
