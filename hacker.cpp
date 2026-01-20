@@ -95,7 +95,12 @@ int main(int argc, char ** argv) {
             return 1;
         }
 
-        // TODO: check sim_time_start == sim_time_end
+        // check sim_time_start == sim_time_end
+        if (telem.sim_time_start != telem.sim_time_end) {
+            // we read partially updated data
+            continue;
+        }
+
         // TODO: only print if sim_time is different from last iteration
 
         // print the read data
