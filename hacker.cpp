@@ -2,7 +2,29 @@
 #include <Windows.h>
 #include <TlHelp32.h>
 #include <cstdint>
+#include <cstdlib>
 
+// struct copied from target.cpp
+// irl this would need to be derived from either docs or
+// crosschecking the binary values with what the target shows
+struct Telemetry {
+    uint32_t sim_time_start;
+    uint16_t speed;
+    uint16_t rpm;
+    uint8_t gear;
+    uint32_t sim_time_end;
+};
+
+// helper to print telemetry data
+void printTelemetry(Telemetry telem) {
+    std::cout << "====" << std::endl;
+    std::cout << "sim_time: " << telem.sim_time_start << std::endl;
+    std::cout << "\tspeed: " << telem.speed << std::endl;
+    std::cout << "\trpm: " << telem.rpm << std::endl;
+    std::cout << "\tgear: " << (int)telem.gear << std::endl;
+}
+
+// helper to find a PID by exe name
 DWORD findProcess(const char* name) {
     // create a snapshot of all running processes
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -41,7 +63,7 @@ int main(int argc, char ** argv) {
     uintptr_t address = std::strtoull(argv[2], nullptr, 16);
 
     std::cout << "Target: " << target << std::endl;
-    std::cout << "Address: 0x" << std::hex << address << std::endl;
+    std::cout << "Address: 0x" << std::hex << address << std::dec << std::endl;
     
     // find the target process
     DWORD pid = findProcess(target);
@@ -58,7 +80,30 @@ int main(int argc, char ** argv) {
         return 1;
     }
 
-    // TODO: ReadProcessMemory
+    // prepare the buffer to write the read data into
+    Telemetry telem = {};
+    SIZE_T bytes_read = 0;
+
+    while (true) {
+        // read the process memory at the provided address
+        bool read_succ = ReadProcessMemory(process, (LPCVOID)address, &telem, sizeof(Telemetry), &bytes_read);
+    
+        // check if the whole structure was read
+        if (!read_succ || bytes_read != sizeof(Telemetry)) {
+            std::cout << "Memory read was unsuccessful. Error: " << GetLastError() << std::endl;
+            CloseHandle(process);
+            return 1;
+        }
+
+        // TODO: check sim_time_start == sim_time_end
+        // TODO: only print if sim_time is different from last iteration
+
+        // print the read data
+        printTelemetry(telem);
+
+        // faster read freq than the data is updated to not miss anything
+        Sleep(50);
+    }
 
     CloseHandle(process);
     return 0;
