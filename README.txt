@@ -22,9 +22,9 @@ This project consists of two applications:
 
 FILES
 -----
-target.cpp      - Target application source
-hacker.cpp      - Hacker application source  
-build.bat       - Build script
+target.cpp        - Target application source
+hacker.cpp        - Hacker application source  
+build.bat         - Build script
 racemake_demo.mp4 - Video demonstration
 
 
