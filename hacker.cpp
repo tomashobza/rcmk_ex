@@ -81,6 +81,7 @@ int main(int argc, char ** argv) {
     }
 
     // prepare the buffer to write the read data into
+    uint32_t sim_time_last = 0;
     Telemetry telem = {};
     SIZE_T bytes_read = 0;
 
@@ -97,11 +98,17 @@ int main(int argc, char ** argv) {
 
         // check sim_time_start == sim_time_end
         if (telem.sim_time_start != telem.sim_time_end) {
-            // we read partially updated data
+            // we read partially updated data, sleep and continue
+            Sleep(50);
             continue;
         }
 
-        // TODO: only print if sim_time is different from last iteration
+        // only print if sim_time is different from last iteration
+        if (telem.sim_time_start == sim_time_last) {
+            Sleep(50);
+            continue;
+        }
+        sim_time_last = telem.sim_time_start; // update last seen simulation time
 
         // print the read data
         printTelemetry(telem);
